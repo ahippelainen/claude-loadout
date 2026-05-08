@@ -1,0 +1,5 @@
+*.backup.*
+.DS_Store
+__pycache__/
+venv/
+.claude/settings.local.json

@@ -1,0 +1,44 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ruff check:*)",
+      "Bash(ruff format:*)",
+      "Bash(python -m pytest:*)",
+      "Bash(python3 -m pytest:*)",
+      "Bash(git show:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git status:*)",
+      "Bash($HOME/Git/dotfiles/claude/hooks/ralph/setup-ralph-loop.sh:*)",
+      "WebSearch"
+    ],
+    "additionalDirectories": [
+      "/tmp"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/Git/dotfiles/claude/hooks/auto-commit-dotfiles.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/Git/dotfiles/claude/hooks/ralph/stop-hook.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "effortLevel": "high",
+  "model": "opus"
+}
