@@ -14,7 +14,7 @@ Some of the files in this repo have been written or edited by my clanker (recurs
 
 ## Credits
 
-This repo is a **curated mix**, not original work. Most of what's
+This repo is a **curated mix** combined with original and editing work. Most of what's
 here comes from community projects that were stitched together,
 trimmed, and tuned to personal taste. The skills and agents trace
 back to (among others):
