@@ -47,7 +47,7 @@ an issue and I'll wire in a reference. I apologize in advance for all authors wh
 ## Install
 
 You will need [Claude Code](https://github.com/anthropics/claude-code)
-installed and working before any of this matters.
+installed and working before any of this matters. You may either work directly from the CLI or from a VSCode extension, which is a more user friendly path for beginners; I suggest starting with this, at least if you plan on using CC. 
 
 ### 1. Prerequisites
 
