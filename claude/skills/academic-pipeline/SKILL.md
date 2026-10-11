@@ -1,105 +1,45 @@
 ---
 name: academic-pipeline
-description: "Orchestrate the full research-to-paper pipeline for physics and interdisciplinary science: deep-research-academic → academic-paper → academic-paper-reviewer → revision → re-review → finalize. Triggers on: academic pipeline, research to paper, full paper workflow, paper pipeline, end-to-end paper, research-to-publication. Do NOT trigger for single-step tasks — use the individual skills directly."
+description: "Takes a paper through the author's stages with a checkpoint at each: lit-sweep → academic-paper → /cite-check → academic-paper-reviewer → revision → re-review → journal-port / arxiv-package. Detects the current stage from the files in the project and reports status checked against those files. Triggers: paper pipeline, take this paper to submission, end-to-end paper workflow, where is this paper in the pipeline, what is the next step for this paper. Do NOT trigger for a single stage: call that skill or command directly."
 ---
 
-# Academic Pipeline — Full Research-to-Publication Workflow
+# academic-pipeline
 
-Lightweight orchestrator for the complete paper pipeline. Does not do substantive work — detects stage, dispatches the right skill, manages transitions, enforces checkpoints.
+An orchestrator. It does no substantive work: each stage is run by its own skill, agent or command, and the author approves every transition.
 
----
+## Rules
 
-## When to Use
+1. **Checkpoint after every stage.** Stop, show the outputs (paths and a three-line summary), and wait for his go or his edits. Never chain two stages without it.
+2. **No stage web-searches his unpublished text.** lit-sweep builds queries from field-standard terms and published identifiers; referees look up published work only; there is no originality or plagiarism search over draft text.
+3. **His files are his.** Stages write new files under `LLM/` or `Papers/`; his notes, draft and `.bib` change only when he says so.
+4. **Stale results.** A review or citation check older than the manuscript's last change is stale for the changed parts. Say so and offer to rerun it before anything relies on it.
+5. **Subagents** run with `model: "opus"`.
 
-Use this when starting from a research question and wanting to proceed all the way to a submission-ready manuscript with checkpoints at each stage.
+## Stages
 
-For single steps, use the individual skills directly:
-- Only searching literature → `deep-research-academic`
-- Only writing from existing notes → `academic-paper`
-- Only reviewing a draft → `academic-paper-reviewer`
-- Only parsing referee reports → `academic-paper` (revision-coach mode)
+| # | Stage | Run by | Output | Checkpoint question |
+|---|---|---|---|---|
+| 1 | Literature | lit-sweep | `Papers/READING_GUIDE_<YYMMDD>.md`, `LLM/<YYMMDD>_litsweep_*.md`, `LLM/<YYMMDD>_litsweep.bib` | Is the reading list right; which papers go to ToRead and ToCite? |
+| 2 | Writing | academic-paper (outline, draft, abstract); draft-sections for introduction, conclusions recap and appendix | outline and blocks in `LLM/`; the draft is his `Paper/*.tex` | Outline confirmed? Next subsection? |
+| 3 | Citations | /cite-check | report | Missing and mismatched references resolved? |
+| 4 | Venue | the author; journal-picker agent if undecided | target journal | Which journal? (The review needs a target.) |
+| 5 | Review | academic-paper-reviewer (full) | `LLM/<YYMMDD>_review/` with `decision.md` and its roadmap | Which roadmap items will he act on? |
+| 6 | Revision | academic-paper (revision); physics-review for any disputed derivation | blocks in `LLM/`; he applies them | Done with the revision? |
+| 7 | Re-review | academic-paper-reviewer (re-review), then /cite-check again | `LLM/<YYMMDD>_rereview/` | Ready to submit, or another round? |
+| 8 | Submission | journal-port for the journal template; arxiv-package for arXiv | port directory; tarball | He submits himself |
 
----
+Real referee reports enter at academic-paper's response mode, then stage 7's /cite-check, then stage 8 for the resubmission.
 
-## Pipeline Stages
+## Hand-offs
 
-```
-Stage 1: RESEARCH
-  → Skill: deep-research-academic
-  → Output: Research report with key references + INSPIRE-HEP bibliography
-  → Checkpoint: user confirms research is sufficient before writing
+What each stage must leave for the next:
 
-Stage 2: WRITE
-  → Skill: academic-paper (full or plan mode)
-  → Output: Complete .tex + .bib draft
-  → Checkpoint: user confirms draft before integrity check
+- **1 → 2**: the reading guide with read levels and result tags, and ToCite BibTeX from `inspire.py` only.
+- **2 → 3**: a compilable main `.tex` with its `.bib`; `[CITE: ...]` and `[MATERIAL GAP: ...]` placeholders listed.
+- **5 → 6**: the roadmap in `decision.md`: id (M.. must-address, O.. optional), point, source referee, location.
+- **6 → 7**: the revised source, the old source for a diff, and his notes on which roadmap items were done or declined.
+- **7**: a table per referee: earlier point, the author's claim, location in the revised text, verdict (addressed / partly / not addressed / made worse).
 
-Stage 2.5: INTEGRITY CHECK
-  → Verify all citations exist (arXiv/DOI check)
-  → Flag unverified claims
-  → Must pass before review
+## Stage detection and status
 
-Stage 3: REVIEW
-  → Skill: academic-paper-reviewer (full mode)
-  → Output: 5-reviewer report + Editorial Decision + Revision Roadmap
-  → Checkpoint: user reviews revision roadmap before revising
-
-Stage 4: REVISE
-  → Skill: academic-paper (revision mode)
-  → Input: original draft + Revision Roadmap
-  → Output: revised draft
-
-Stage 4.5: INTEGRITY CHECK (repeat)
-  → Re-verify citations and claims after revision
-
-Stage 3': RE-REVIEW
-  → Skill: academic-paper-reviewer (re-review mode)
-  → Verify revisions address original comments
-  → Output: traceability matrix + new decision
-
-Stage 5: FINALIZE
-  → Final formatting pass (journal style)
-  → Cover letter draft
-  → Submission checklist
-```
-
----
-
-## Stage Detection
-
-Pipeline auto-detects entry point from what the user provides:
-
-| User provides | Entry stage |
-|---------------|-------------|
-| "I want to write a paper on X" (no materials) | Stage 1 (RESEARCH) |
-| Research notes / prior papers | Stage 2 (WRITE) |
-| Existing draft | Stage 2.5 (INTEGRITY) |
-| Draft + referee reports | Stage 4 (REVISE) |
-| Revised draft | Stage 4.5 (INTEGRITY) |
-
----
-
-## Checkpoint Rules
-
-1. **IRON RULE**: Confirm Paper Configuration Record before drafting (Stage 2)
-2. **IRON RULE**: Integrity check must pass before submitting to review (Stage 2.5)
-3. **IRON RULE**: No fabricated citations anywhere in pipeline — flag and stop
-4. User confirms revision roadmap before beginning Stage 4
-5. User can skip Stage 1 if bringing own research materials
-6. User can request Pipeline Status Dashboard at any point
-
----
-
-## Status Dashboard
-
-On request, report:
-
-```
-Pipeline Status
-───────────────
-Current stage : [stage name]
-Completed     : [list]
-Pending       : [list]
-Blockers      : [any integrity failures or unresolved issues]
-Next action   : [what to do next]
-```
+Read the project, not memory: which of the outputs above exist, their dates, and whether they postdate the current manuscript. Report "checked against the files": current stage, completed stages with dates, stale results, blockers (for example unresolved `[CITE]` placeholders or missing references), and the next action. Entry points: a topic and no material → 1; notes or results → 2; a draft → 3; a draft and real referee reports → academic-paper response mode.

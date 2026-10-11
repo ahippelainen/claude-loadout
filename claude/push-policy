@@ -1,0 +1,3 @@
+# Standing push approvals, one repo per line: <absolute path> <free|ask> (bash-guard also accepts ~; the research-autonomous scripts need the absolute path).
+# Any repo not listed is "ask": hooks/bash-guard.py then stops a push until you say yes for that commit.
+~/Git/dotfiles free

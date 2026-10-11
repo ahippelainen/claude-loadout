@@ -22,4 +22,4 @@ Add diagnostic instrumentation at each component boundary:
 
 ## After finding root cause
 
-Add validation at multiple layers (see `defense-in-depth.md`) — makes the bug structurally impossible rather than just patched.
+Fix the cause at its origin, and add a check only where the invalid state can really arise — makes the bug structurally impossible rather than just patched.

@@ -1,7 +1,7 @@
 ---
 name: quant-analyst
 description: Quantitative finance coding — financial models, derivatives pricing, backtesting, portfolio optimization, and risk metrics in Python. Use for implementing trading strategies, pricing models, or analysing financial data.
-model: inherit
+model: opus
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 ---
 

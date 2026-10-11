@@ -1,0 +1,13 @@
+# @NAME@: user crontab entries for this project. NOT installed by the scaffold.
+# Review, then append to your crontab with:  crontab -l | cat - ops/crontab.txt | crontab -
+# (on a first install with no crontab yet: crontab ops/crontab.txt). Check with crontab -l.
+# Compute window @WINDOW@: nightly.sh starts at its start and stops itself at its end; the
+# watchdog (hourly at :07) restarts compute only inside it. Change the window by editing
+# PROGRAM_WINDOW on every line and the start time of the first one.
+# Morning lit sweep 06:45: off by default. Enable it only after filling the placeholders in
+# ops/prompts/litsweep.txt and creating ops/agent-loops.enabled (litsweep.sh refuses otherwise).
+# The PROGRAM_* paths are set per line so runtime files, bulk output and the venv can live
+# outside a synced folder.
+@WIN_M@ @WIN_H@ * * * PROGRAM_WINDOW="@WINDOW@" PROGRAM_RUN="@RUN@" PROGRAM_RAW="@RAW@" PROGRAM_VENV="@VENV@" "@ROOT@/nightly.sh" >> "@RUN@/cron.log" 2>&1
+7 * * * * PROGRAM_WINDOW="@WINDOW@" PROGRAM_RUN="@RUN@" PROGRAM_RAW="@RAW@" PROGRAM_VENV="@VENV@" timeout -k 10 900 "@ROOT@/ops/watchdog.sh" >> "@RUN@/cron.log" 2>&1
+# 45 6 * * * PROGRAM_WINDOW="@WINDOW@" PROGRAM_RUN="@RUN@" PROGRAM_RAW="@RAW@" PROGRAM_VENV="@VENV@" "@ROOT@/ops/litsweep.sh" >> "@RUN@/cron.log" 2>&1

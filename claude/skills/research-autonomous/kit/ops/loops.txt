@@ -1,0 +1,5 @@
+# Loops supervised by ops/watchdog.sh: <name> <kind> <launcher...> (paths relative to repo root).
+# kind compute: restarted only inside the nightly window and only if jobs are queued/running.
+# kind agent: considered only if ops/agent-loops.enabled exists (host-local, gitignored).
+runner        compute  nightly.sh
+orchestrator  agent    ops/agent_loop.sh orchestrator

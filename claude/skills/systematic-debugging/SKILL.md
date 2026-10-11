@@ -73,4 +73,3 @@ Each fix revealing a new problem in a different place is the signature of an arc
 ## Supporting Techniques
 
 - `root-cause-tracing.md` — trace backward through call chain to original trigger
-- `defense-in-depth.md` — add validation at multiple layers after finding root cause

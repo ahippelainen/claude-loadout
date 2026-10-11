@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Inter, 'Source Sans Pro', 'Source Sans 3', Helvetica, Arial, sans-serif">
+<title>Research flow with the author in the loop: Claude works in LLM/, the author checks and promotes</title>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#52606d"/></marker></defs>
+<rect width="1600" height="900" fill="#ffffff"/>
+<rect x="30" y="40" width="290" height="150" rx="16" fill="#fdf3ea" stroke="#e0a36f" stroke-width="2"/>
+<circle cx="64" cy="63" r="7" fill="#e0a36f"/><path d="M51,85 a13,11 0 0 1 26,0 z" fill="#e0a36f"/>
+<text x="92" y="74" font-size="21" font-weight="700" fill="#1f2933" text-anchor="start" xml:space="preserve">You</text>
+<text x="48" y="107" font-size="18" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">dictate the question</text>
+<text x="48" y="131.3" font-size="18" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">in plain words</text>
+<rect x="390" y="30" width="560" height="170" rx="16" fill="#eef4fb" stroke="#7b9cc4" stroke-width="2"/>
+<g fill="#d97757" shape-rendering="crispEdges"><rect x="411.2" y="46" width="3.2" height="3.2"/><rect x="414.4" y="46" width="3.2" height="3.2"/><rect x="417.6" y="46" width="3.2" height="3.2"/><rect x="420.8" y="46" width="3.2" height="3.2"/><rect x="424" y="46" width="3.2" height="3.2"/><rect x="427.2" y="46" width="3.2" height="3.2"/><rect x="430.4" y="46" width="3.2" height="3.2"/><rect x="433.6" y="46" width="3.2" height="3.2"/><rect x="436.8" y="46" width="3.2" height="3.2"/><rect x="411.2" y="49.2" width="3.2" height="3.2"/><rect x="414.4" y="49.2" width="3.2" height="3.2"/><rect x="420.8" y="49.2" width="3.2" height="3.2"/><rect x="424" y="49.2" width="3.2" height="3.2"/><rect x="427.2" y="49.2" width="3.2" height="3.2"/><rect x="433.6" y="49.2" width="3.2" height="3.2"/><rect x="436.8" y="49.2" width="3.2" height="3.2"/><rect x="408" y="52.4" width="3.2" height="3.2"/><rect x="411.2" y="52.4" width="3.2" height="3.2"/><rect x="414.4" y="52.4" width="3.2" height="3.2"/><rect x="417.6" y="52.4" width="3.2" height="3.2"/><rect x="420.8" y="52.4" width="3.2" height="3.2"/><rect x="424" y="52.4" width="3.2" height="3.2"/><rect x="427.2" y="52.4" width="3.2" height="3.2"/><rect x="430.4" y="52.4" width="3.2" height="3.2"/><rect x="433.6" y="52.4" width="3.2" height="3.2"/><rect x="436.8" y="52.4" width="3.2" height="3.2"/><rect x="440" y="52.4" width="3.2" height="3.2"/><rect x="411.2" y="55.6" width="3.2" height="3.2"/><rect x="414.4" y="55.6" width="3.2" height="3.2"/><rect x="417.6" y="55.6" width="3.2" height="3.2"/><rect x="420.8" y="55.6" width="3.2" height="3.2"/><rect x="424" y="55.6" width="3.2" height="3.2"/><rect x="427.2" y="55.6" width="3.2" height="3.2"/><rect x="430.4" y="55.6" width="3.2" height="3.2"/><rect x="433.6" y="55.6" width="3.2" height="3.2"/><rect x="436.8" y="55.6" width="3.2" height="3.2"/><rect x="411.2" y="58.8" width="3.2" height="3.2"/><rect x="417.6" y="58.8" width="3.2" height="3.2"/><rect x="430.4" y="58.8" width="3.2" height="3.2"/><rect x="436.8" y="58.8" width="3.2" height="3.2"/></g>
+<text x="455.2" y="64" font-size="21" font-weight="700" fill="#1f2933" text-anchor="start" xml:space="preserve">Claude Code session</text>
+<text x="408" y="97" font-size="18" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">reads your rules (CLAUDE.md) and</text>
+<text x="408" y="121.3" font-size="18" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">the project's LLM/conventions.md;</text>
+<text x="408" y="145.6" font-size="18" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">plans, asks before fixing a convention</text>
+<path d="M320,115 L390,115" fill="none" stroke="#52606d" stroke-width="2.4" marker-end="url(#arrow)"/>
+<rect x="30" y="250" width="1060" height="400" rx="16" fill="#eef4fb" stroke="#7b9cc4" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="52" y="286" font-size="24" font-weight="700" fill="#1f2933" text-anchor="start" xml:space="preserve">LLM/  — Claude's sandbox</text>
+<text x="52" y="314" font-size="18" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">specialist subagents, each in a fresh context</text>
+<rect x="52" y="334" width="320" height="130" rx="16" fill="#eef4fb" stroke="#7b9cc4" stroke-width="2"/>
+<text x="70" y="368" font-size="19" font-weight="700" fill="#1f2933" text-anchor="start" xml:space="preserve">Literature</text>
+<text x="70" y="398.75" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">lit-sweep: arXiv, INSPIRE</text>
+<text x="70" y="421.7" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">notes → LLM/, PDFs → Papers/</text>
+<rect x="392" y="334" width="320" height="130" rx="16" fill="#eef4fb" stroke="#7b9cc4" stroke-width="2"/>
+<text x="410" y="368" font-size="19" font-weight="700" fill="#1f2933" text-anchor="start" xml:space="preserve">Derivations</text>
+<text x="410" y="398.75" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">holographist, fluctuation-</text>
+<text x="410" y="421.7" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">analyst, radial-ode-specialist</text>
+<rect x="732" y="334" width="320" height="130" rx="16" fill="#eef4fb" stroke="#7b9cc4" stroke-width="2"/>
+<text x="750" y="368" font-size="19" font-weight="700" fill="#1f2933" text-anchor="start" xml:space="preserve">Numerics</text>
+<text x="750" y="398.75" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">mathematica-pro, python-pro</text>
+<text x="750" y="421.7" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">runs time-boxed (wlrun)</text>
+<path d="M670,200 L670,250" fill="none" stroke="#52606d" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="690" y="232" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve" font-style="italic">delegates</text>
+<text x="52" y="500" font-size="18" font-weight="700" fill="#52606d" text-anchor="start" xml:space="preserve">what lands here:</text>
+<rect x="52" y="515" width="168.8" height="30" rx="8" fill="#eef4fb" stroke="#7b9cc4" stroke-width="1.5"/>
+<text x="62" y="534" font-size="16" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve" font-family="'JetBrains Mono', 'DejaVu Sans Mono', monospace">YYMMDD_Topic.wl</text>
+<rect x="232.8" y="515" width="148.96" height="30" rx="8" fill="#eef4fb" stroke="#7b9cc4" stroke-width="1.5"/>
+<text x="242.8" y="534" font-size="16" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve" font-family="'JetBrains Mono', 'DejaVu Sans Mono', monospace">run_topic.log</text>
+<rect x="393.76" y="515" width="119.2" height="30" rx="8" fill="#eef4fb" stroke="#7b9cc4" stroke-width="1.5"/>
+<text x="403.76" y="534" font-size="16" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve" font-family="'JetBrains Mono', 'DejaVu Sans Mono', monospace">Cache/*.mx</text>
+<rect x="52" y="565" width="268" height="30" rx="8" fill="#eef4fb" stroke="#7b9cc4" stroke-width="1.5"/>
+<text x="62" y="584" font-size="16" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve" font-family="'JetBrains Mono', 'DejaVu Sans Mono', monospace">notebook_sources/*_src.wl</text>
+<rect x="332" y="565" width="168.8" height="30" rx="8" fill="#eef4fb" stroke="#7b9cc4" stroke-width="1.5"/>
+<text x="342" y="584" font-size="16" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve" font-family="'JetBrains Mono', 'DejaVu Sans Mono', monospace">YYMMDD_note.tex</text>
+<rect x="512.8" y="565" width="78.24" height="30" rx="8" fill="#eef4fb" stroke="#7b9cc4" stroke-width="1.5"/>
+<text x="522.8" y="584" font-size="16" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve">figures</text>
+<text x="52" y="630" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve" font-style="italic">a changed computation is a new dated script, never an edit of the old one</text>
+<rect x="1150" y="250" width="420" height="210" rx="16" fill="#f3eefb" stroke="#9b85c9" stroke-width="2"/>
+<text x="1168" y="284" font-size="21" font-weight="700" fill="#1f2933" text-anchor="start" xml:space="preserve">Independent checks</text>
+<text x="1168" y="315.75" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">physics-review verify: recomputes</text>
+<text x="1168" y="338.7" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">from scratch in a fresh context</text>
+<text x="1168" y="361.65" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">derivation-note: every step, compiled</text>
+<text x="1168" y="384.6" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">with your preamble</text>
+<text x="1168" y="407.55" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">academic-paper-reviewer: mock referees</text>
+<path d="M1090,355 L1150,355" fill="none" stroke="#52606d" stroke-width="2.4" marker-end="url(#arrow)"/>
+<rect x="1150" y="500" width="420" height="120" rx="16" fill="#fdf3ea" stroke="#e0a36f" stroke-width="2"/>
+<circle cx="1184" cy="523" r="7" fill="#e0a36f"/><path d="M1171,545 a13,11 0 0 1 26,0 z" fill="#e0a36f"/>
+<text x="1212" y="534" font-size="21" font-weight="700" fill="#1f2933" text-anchor="start" xml:space="preserve">You check and promote</text>
+<text x="1168" y="565.75" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">step through the notebook, read the note;</text>
+<text x="1168" y="588.7" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">nothing leaves LLM/ without you</text>
+<path d="M1360,460 L1360,500" fill="none" stroke="#52606d" stroke-width="2.4" marker-end="url(#arrow)"/>
+<path d="M1150,580 L1120,580 L1120,115 L950,115" fill="none" stroke="#52606d" stroke-width="2.4" stroke-dasharray="7 6" marker-end="url(#arrow)"/>
+<text x="1135" y="150" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve" font-style="italic">fix this, try that</text>
+<rect x="1150" y="680" width="420" height="190" rx="16" fill="#f1f7ee" stroke="#8fb67f" stroke-width="2"/>
+<text x="1168" y="714" font-size="21" font-weight="700" fill="#1f2933" text-anchor="start" xml:space="preserve">Your files</text>
+<text x="1168" y="745.75" font-size="16" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve" font-family="'JetBrains Mono', 'DejaVu Sans Mono', monospace">Numerics/  Paper/  notes.tex</text>
+<text x="1168" y="768.7" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">the paper chain from here:</text>
+<text x="1168" y="791.65" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">academic-paper, /cite-check,</text>
+<text x="1168" y="814.6" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">journal-port, arxiv-package</text>
+<path d="M1360,620 L1360,680" fill="none" stroke="#52606d" stroke-width="2.4" marker-end="url(#arrow)"/>
+<text x="1375" y="655" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve" font-style="italic">promote</text>
+<rect x="30" y="690" width="1060" height="180" rx="16" fill="#fbfbf3" stroke="#c9c08f" stroke-width="2"/>
+<text x="52" y="726" font-size="22" font-weight="700" fill="#1f2933" text-anchor="start" xml:space="preserve">Always on</text>
+<text x="190" y="726" font-size="18" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve">rules in CLAUDE.md, and hooks that run every time (the model cannot skip them)</text>
+<text x="52" y="770" font-size="17" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve">• claims tagged measured / inferred / web-sourced / assumed</text>
+<text x="612" y="770" font-size="17" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve">• a .tex edit → chktex warnings back to Claude</text>
+<text x="52" y="810" font-size="17" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve">• Mathematica only with a kill timeout; leftover kernels killed</text>
+<text x="612" y="810" font-size="17" font-weight="400" fill="#1f2933" text-anchor="start" xml:space="preserve">• git push only where you have approved it</text>
+<text x="52" y="852" font-size="17" font-weight="400" fill="#52606d" text-anchor="start" xml:space="preserve" font-style="italic">corrections you give go into memory at once, so the next session has them</text>
+</svg>

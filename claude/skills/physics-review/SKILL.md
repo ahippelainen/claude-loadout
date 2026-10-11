@@ -1,6 +1,6 @@
 ---
 name: physics-review
-description: Use this skill when the user asks for a sanity check, review, or verification of physics or math content — especially anything involving AdS/CFT, holography, general relativity, quantum field theory, or related high-energy theory. Fires on phrases like "check this derivation", "does this calculation hold up", "review this section". Do NOT fire for routine LaTeX typesetting help or bibliography management.
+description: Use this skill when the user asks for a sanity check, review, or verification of physics or math content — especially anything involving AdS/CFT, holography, general relativity, quantum field theory, or related high-energy theory. Fires on phrases like "check this derivation", "check my calculation", "does this calculation hold up", "review this section"; modes "verify" (independent recomputation in a fresh context) and "gap-finding" ("what would a coauthor object to"). Do NOT fire for a referee-style review of a whole paper (academic-paper-reviewer), routine LaTeX typesetting, or bibliography management.
 ---
 
 # Physics review mode
@@ -86,6 +86,35 @@ When reviewing a chunk of material, structure the response as:
 
 Do not pad the response with restatements of the physics the user
 already knows. They are a PhD candidate, not an undergraduate.
+
+Conventions come from the project's `LLM/conventions.md`
+(`~/Git/dotfiles/claude/contexts/physics-conventions.md`); never assume
+a default.
+
+## Mode: verify (on request: "verify this", "independent check")
+
+An independent recomputation in a fresh context, so the check does not
+inherit the reasoning it is checking. Spawn one subagent (model opus;
+`fluctuation-analyst` for variations, `radial-ode-specialist` for ODEs,
+`general-purpose` otherwise) with only: the claim stated as a
+hypothesis, the inputs it rests on (action, background, conventions
+file), and the instruction to derive or compute it from scratch by its
+own route, with its own code if numerics are involved, before looking
+at the author's version. It returns where the two agree, where they
+differ (with the first line at which they part), and what it could not
+check. Relay that as it is: no confidence grades or status labels. The
+author checks the result himself.
+
+## Mode: gap-finding (on request: "find the gaps", "what would a coauthor object to")
+
+For an argument that has to convince a reader: list every step with the
+justification it needs, and mark each as derived here, cited, a
+convention (a choice that could be made otherwise), or missing. Make the
+dictionary explicit: which bulk field sources which operator, which
+normalization fixes which constant, and for each normalization whether
+it is a convention or a consequence. The output is the list of gaps a
+careful coauthor would raise, ordered by how much of the argument rests
+on each; `derivation-note` turns the settled ones into a note.
 
 ## What this skill does NOT do
 

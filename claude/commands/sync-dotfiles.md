@@ -1,16 +1,14 @@
 ---
-description: Pull, commit, and push ~/Git/dotfiles — keeps local and remote in sync
-allowed-tools: Bash(git -C $HOME/Git/dotfiles:*)
+description: Fold auto-commits, check, and push ~/Git/dotfiles so local and remote stay in sync
 ---
 
-Sync the dotfiles repo.
+Sync the dotfiles repo (`~/Git/dotfiles`, standing push approval in `claude/push-policy`).
 
-Steps:
-1. `git -C "$HOME/Git/dotfiles" fetch origin` — fetch remote state.
-2. `git -C "$HOME/Git/dotfiles" status --short` — show uncommitted changes.
-3. If there are uncommitted changes: `git -C "$HOME/Git/dotfiles" diff` — read them, then `git -C "$HOME/Git/dotfiles" add -A` and commit with a one-line message naming what changed (e.g. "Add /ship command", "Update CLAUDE.md tone rules"). No Claude co-author trailer.
-4. `git -C "$HOME/Git/dotfiles" rebase origin/main` — replay any local commits on top of remote (handles both fast-forward and diverged cases). If rebase conflicts arise, abort with `git -C "$HOME/Git/dotfiles" rebase --abort`, report the conflict, and stop.
-5. `git -C "$HOME/Git/dotfiles" push` — push result to origin.
-6. Report final state in one line: commit hash and message.
+1. `git -C ~/Git/dotfiles fetch origin` and `git -C ~/Git/dotfiles status --short`.
+2. Uncommitted changes: read the diff, stage the files that belong together by name (`git add -- <paths>`), and commit with a `type: description` message. Untracked files you did not create in this session: list them and ask.
+3. Fold the local `[auto-commit-dotfiles]` commits (those not on `origin/main`) into commits with real messages: `git reset --soft origin/main`, then commit by topic. Never rewrite commits already on `origin/main`.
+4. `python3 ~/Git/dotfiles/claude/tools/check.py`: the index must be current and the check clean; fix what it reports.
+5. If `origin/main` moved: `git rebase origin/main`; on conflict `git rebase --abort`, report and stop.
+6. `git -C ~/Git/dotfiles push`, then report the pushed commits in one line each.
 
-Do not touch any other repo. Do not run linters — dotfiles is markdown and shell.
+No attribution trailers. Do not touch any other repo.

@@ -7,9 +7,9 @@ set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Required tools. Hooks depend on these; bail early if missing.
+# Required tools: the hooks use git, jq and python3; bail early if missing.
 missing=()
-for cmd in git jq ruff; do
+for cmd in git jq python3; do
   command -v "$cmd" >/dev/null 2>&1 || missing+=("$cmd")
 done
 if (( ${#missing[@]} > 0 )); then
@@ -39,30 +39,35 @@ link() {
 # Claude Code global config
 link "$DOTFILES_DIR/claude/CLAUDE.md"     "$HOME/.claude/CLAUDE.md"
 link "$DOTFILES_DIR/claude/settings.json" "$HOME/.claude/settings.json"
-
-# Claude Code commands — one symlink per item, so INDEX docs are skipped
-# and locally-installed commands not in this repo remain untouched.
-# Drop any legacy whole-dir symlink from earlier versions of this script.
-[[ -L "$HOME/.claude/commands" ]] && rm "$HOME/.claude/commands"
-mkdir -p "$HOME/.claude/commands"
-for cmd_path in "$DOTFILES_DIR/claude/commands/"*; do
-  cmd_name="$(basename "$cmd_path")"
-  [[ "$cmd_name" == "INDEX.md" || "$cmd_name" == "INDEX_SHORT.md" ]] && continue
-  link "$cmd_path" "$HOME/.claude/commands/$cmd_name"
-done
+link "$DOTFILES_DIR/claude/commands"      "$HOME/.claude/commands"
 
 # Claude Code skills — one symlink per skill directory, so locally-installed
-# skills in ~/.claude/skills/ that are NOT in this repo remain untouched.
+# skills in ~/.claude/skills/ that are NOT in dotfiles remain untouched.
 for skill_dir in "$DOTFILES_DIR/claude/skills/"*/; do
   skill_name="$(basename "$skill_dir")"
   link "$skill_dir" "$HOME/.claude/skills/$skill_name"
 done
 
-# Claude Code agents — one symlink per agent file. INDEX docs are skipped.
-for agent_file in "$DOTFILES_DIR/claude/agents/"*.md; do
-  agent_name="$(basename "$agent_file")"
-  [[ "$agent_name" == "INDEX.md" || "$agent_name" == "INDEX_SHORT.md" ]] && continue
-  link "$agent_file" "$HOME/.claude/agents/$agent_name"
+# Claude Code agents — one symlink per agent file, recursing into subdirectories
+# (e.g. claude/agents/physics/). Files land flat in ~/.claude/agents/.
+while IFS= read -r -d '' agent_file; do
+  base="$(basename "$agent_file")"
+  [[ "$base" == INDEX*.md ]] && continue
+  link "$agent_file" "$HOME/.claude/agents/$base"
+done < <(find "$DOTFILES_DIR/claude/agents" -type f -name '*.md' -print0)
+
+# Rules: top-level files only (each scoped by `paths:` frontmatter); rules/latex/ is read by path from skills.
+for rule in "$DOTFILES_DIR/claude/rules/"*.md; do
+  [[ -e "$rule" ]] || continue
+  link "$rule" "$HOME/.claude/rules/$(basename "$rule")"
 done
 
+# Drop dangling links into this repo, left behind when an item is deleted or renamed here.
+for l in "$HOME"/.claude/{skills,agents,rules,contexts}/*; do
+  [[ -L "$l" && ! -e "$l" && "$(readlink "$l")" == "$DOTFILES_DIR"/* ]] || continue
+  rm "$l"
+  echo "Pruned $l"
+done
+
+python3 "$DOTFILES_DIR/claude/tools/check.py" || echo "check.py reported problems (see above)."
 echo "Done."

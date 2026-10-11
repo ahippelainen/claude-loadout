@@ -1,198 +1,56 @@
-# Claude Code Setup Guide
+# Claude Code setup: guide
 
-Personal reference for this Claude Code configuration. When in doubt: look here first, then check the INDEX.md in the relevant subfolder for full descriptions.
-
----
-
-## Directory layout
-
-```
-~/Git/dotfiles/claude/
-├── GUIDE.md          ← you are here
-├── CLAUDE.md         ← global behavioral rules (always loaded)
-├── commands/         ← slash commands (/name triggers these)
-│   └── INDEX.md
-├── skills/           ← description-triggered or explicit behavior modules
-│   └── INDEX.md
-├── agents/           ← spawnable subagents (via Agent tool or commands)
-│   └── INDEX.md
-├── hooks/            ← automated shell actions on tool events
-│   └── INDEX.md
-├── rules/            ← coding standards (common/, python/)
-└── contexts/         ← domain context files
-```
-
-`~/.claude/` symlinks into this repo — editing here is live immediately.
-
----
+How this setup is meant to be used. The full list of skills, agents, commands and hooks, with one line each, is the generated `INDEX.md`.
 
 ## What to reach for
 
-### "I want Claude to do X automatically"
-→ **Hook** — no model judgment needed (e.g. run linter after every edit)
-→ **Skill with auto-trigger** — judgment needed (e.g. enforce TDD on new features)
-→ **CLAUDE.md rule** — simple behavioral preference (e.g. "no docstrings")
+| I want… | Mechanism |
+|---|---|
+| Something to happen on every tool event, no judgement needed | Hook (`hooks/`, wired in `settings.json`) |
+| Behaviour that switches on by context or phrasing | Skill (`skills/<name>/SKILL.md`) |
+| A pipeline I start by typing `/name` | Command (`commands/`) |
+| An expert in a fresh context, in parallel or for review | Agent (`agents/`) |
+| A rule for every session | `CLAUDE.md` |
+| A fact that may change, remembered across sessions | Auto-memory (per project) |
 
-### "I want to invoke X explicitly"
-→ **Slash command** — multi-step pipeline you type often (`/ship`, `/debug`)
-→ **Skill** — mode of behavior to activate (`brainstorming`, `simplify-legacy`)
-→ **Agent** via Agent tool — isolated subagent with its own context window
-
-### "I want to remember something across sessions"
-→ **Auto-memory** (`~/.claude/projects/.../memory/`) — session facts that change
-→ **CLAUDE.md** — permanent behavioral rules
-
-### "I want to create new plugins"
-→ `/insights-triage` — parses `/insights` output and proposes what to build
-→ `propose-persistence` skill — fires when conversation signals something worth encoding
-→ `writing-skills` skill — guidance for authoring new skills and plans
-→ `brainstorming` skill — design before implementation
-
----
+When something should persist, `propose-persistence` picks the bucket and drafts it; it also runs a token audit of a session or triages an `/insights` report on request.
 
 ## Workflows
 
-### Hobby coding (poly_bot, bots, scripts)
+### Research (hep-th, holographic QCD, economics of inequality)
 
-**New feature:**
-```
-brainstorming skill (design) → writing-skills skill (plan) → code with test-driven-development → /ship
-```
+- **New project**: `/research-init` lays out `Data/ Images/ LLM/ Numerics/ Paper/ Papers/ Submissions/` (notes live in `Paper/`, Claude's files in `LLM/`) and `LLM/conventions.md`; in `~/Git` it also makes a git repo with a private remote, pushes ask-first.
+- **Conventions**: each project keeps `LLM/conventions.md`; the physics agents read it, ask when something is unfixed, and record what gets established (`contexts/physics-conventions.md`). No agent carries default conventions.
+- **Checking a derivation**: `physics-review` (fires on "check this derivation"; mode `verify` recomputes independently in a fresh context and reports agreements and disagreements, mode `gap-finding` lists what a coauthor would object to); `derivation-note` writes a fully explicit companion note compiled with the draft's preamble, never touching the draft; for long variations `fluctuation-analyst`, for radial ODEs and spectra `radial-ode-specialist`, for importing a formula from a paper `convention-translator`, for model building and the dictionary `holographist`.
+- **Mathematica**: `mathematica-pro` for scripts and review, `mathematica-notebook` for `.nb` files. Runs go through `tools/wlrun <seconds> <file>` (KILL timeout, memory cap, licence retry, no surviving kernel); `rules/mathematica.md` (loaded when Mathematica files are touched) holds the traps met so far.
+- **Economics models**: `academic-economist` referees a model idea or draft; `data-analyst` for the data work.
+- **Literature**: `lit-sweep` (parallel strands, each source tagged, bibliography only from INSPIRE or Crossref via `skills/lit-sweep/inspire.py`); `/cite-check` for missing, unused and wrong bibliography entries.
+- **Writing**: `academic-paper` (drafting, revision, referee responses), `draft-sections` (introduction, conclusions recap, appendices as text to rewrite), `academic-paper-reviewer` (simulated review), `academic-pipeline` (the three in sequence with checkpoints).
+- **Submitting**: `journal-picker` → `journal-port` → `arxiv-package` → `share-to-github` for code and data.
+- **The attended flow (physics)**: Claude works only in the project's `LLM/` (dated scripts, logs, caches, generated notebooks, draft text); everything outside is yours to check and promote into `Numerics/` and `Paper/` (`research-init`, section "Working in the project").
+- **Autonomous programs (mathematics)**: `research-autonomous` sets up and runs a program that lives for weeks from a folder and a problem: `CHARTER.md` with [K]/[V]/[H] tags, ledgers IDEAS → CANDIDATES → VERIFIED (tiers V0–V3) / KILLED, task cards, fresh adversaries, nightly compute by cron, hourly watchdog, headless orchestrator rounds, daily literature watch, `roadmap/roadmap.py`, lecture and companion notes for your sign-off. Only V3 (you understood it end to end) is publishable.
+- **Long unattended runs**: `autonomous-loop` (research nights) and `general-loop` (software builds) share `skills/autonomous-loop/rails.md`: a session cap across nesting, the orchestrator under `/goal` plus a check-in every 30 min (so a quota reset does not leave it idle), fresh agents per round, guard scripts, protected checks (`LOOP/protected.txt`, enforced by a hook) and independent verification before anything is called proved.
 
-**Hard bug:**
-```
-/debug [description] → follow checkpoint prompts (sessions survive context resets)
-```
+### Hobby coding (bots, tools, websites)
 
-**Unfamiliar codebase:**
-```
-/map-codebase → produces .planning/codebase/{STACK,INTEGRATIONS,ARCHITECTURE,STRUCTURE,CONVENTIONS,TESTING,CONCERNS}.md
-```
+- Writing and review: `python-pro`; debugging: `systematic-debugging` and the `debugger` agent; test-first on request: `test-driven-development`.
+- `/lint` (ruff), `/ship` (lint, test, commit, push if the repo's push policy allows).
+- An external LLM's plan: `/external-plan review`, then `execute`, then `merge`.
+- `security` before publishing a repo or when a key may have leaked; `architecture-reviewer` for a design; `ui-designer` for a design pass on a site or app; `quant-analyst` and `qual-analyst` for the trading projects.
 
-**Large autonomous task (multi-step plan):**
-```
-subagent-driven-development skill → fresh subagent per task → two-stage review → finishing-a-development-branch
-```
+### Maintaining the setup
 
-### Science work (hep-th, LaTeX papers)
+- `/sync-dotfiles`: fold auto-commits into real commits, run `tools/check.py`, push.
+- `/memory-audit` (monthly): stale, duplicated or misplaced memories across projects, and rules that belong in CLAUDE.md.
+- `tools/check.py`: regenerates `INDEX.md` and reports bad frontmatter, dangling paths and missing hook targets; `install.sh` runs it too.
+- Built in: `/doctor prompt-audit` for stale or contradictory instructions, `/insights` for a usage report.
 
-**Physics derivation check:**
-Say "check this derivation", "sanity check", or paste LaTeX → `physics-review` skill auto-fires.
-Returns: summary of claim → checks passed → concerns with confidence levels (Confirmed / Likely correct / Uncertain / Do not know) → suggested next step.
+## Safety rails
 
-**Literature search + bibliography:**
-```
-deep-research-academic skill → INSPIRE-HEP verified BibTeX → Schema 1 handoff
-```
-Never produces BibTeX from memory — every entry verified against INSPIRE-HEP or flagged UNVERIFIED.
-
-**New LaTeX project with Overleaf:**
-```
-/repo-init → two-branch structure (main + ol) + GitHub + Overleaf remotes
-/ol-sync push → sync main's LaTeX files to ol and Overleaf, pull collaborator edits back
-```
-
----
-
-## Skills reference
-
-### Auto-firing (no explicit invocation needed)
-
-| Skill | Fires when |
-|---|---|
-| `physics-review` | "check derivation", "sanity check", pasted LaTeX for correctness |
-| `test-driven-development` | Writing new features or fixing bugs |
-| `systematic-debugging` | Any bug, test failure, or unexpected behavior |
-| `verification-before-completion` | About to claim work is done, commit, or create PR |
-| `simplify-legacy` | "clean up", "rewrite", "simplify", expressed frustration with existing code |
-| `propose-persistence` | Repeated correction, "from now on", 3× manual ritual, concrete token waste |
-| `brainstorming` | Before any non-trivial feature |
-| `deep-research-academic` | "research X for a paper" when papers are provided |
-| `academic-paper` | "write / draft / revise paper" |
-| `academic-paper-reviewer` | "peer review", "referee report" |
-| `academic-pipeline` | "full paper workflow", research-to-publication |
-
-### Explicit invocation
-
-| Skill | When to reach for it |
-|---|---|
-| `writing-skills` | Writing an implementation plan, or authoring a new skill |
-| `subagent-driven-development` | Executing a plan with per-task fresh subagents |
-| `executing-plans` | Executing a plan step-by-step in the same session |
-| `finishing-a-development-branch` | Branch complete — merge, PR, or discard |
-| `using-git-worktrees` | Isolated feature branch with safety checks |
-| `token-audit` | Session getting expensive; find and fix structural waste |
-| `agentic-engineering` | Building multi-agent systems, eval-first design, model routing |
-
----
-
-## Agents reference
-
-Full descriptions in `agents/INDEX.md`. Quick routing guide:
-
-**Python code work:**
-`python-pro` (write/review), `tdd-guide` (test-first), `code-architect` (blueprint), `planner` (phased plan)
-
-**Refactoring and cleanup:**
-`code-simplifier` (clarity), `legacy-modernizer` (incremental migration)
-
-**Debugging:**
-`debugger` (individual bug, scientific method), `error-analyst` (recurring patterns, cascades), `silent-failure-hunter` (swallowed exceptions, NaN propagation)
-
-**Code quality:**
-`python-pro` (full review), `type-design-analyzer` (invariants, pydantic v2), `comment-analyzer` (accuracy and staleness)
-
-**Security:**
-`security` (OWASP, secrets, infra hardening, incident response)
-
-**Performance:**
-`performance-engineer` (profiling, load testing, observability)
-
-**Data / quant:**
-`data-analyst` (EDA, statistics, time series, Bayesian), `quant-analyst` (derivatives, backtesting, portfolio)
-
----
-
-## Commands reference
-
-Full descriptions in `commands/INDEX.md`. Quick reference:
-
-| Command | One-liner |
-|---|---|
-| `/ship` | lint → test → commit → push |
-| `/sync-dotfiles` | commit + push ~/Git/dotfiles |
-| `/lint` | ruff fix + format on changed Python files |
-| `/python-review` | full review via python-pro agent |
-| `/test-coverage` | find gaps, generate missing pytest tests to 80%+ |
-| `/ol-sync push` | sync main's LaTeX → ol → Overleaf, pull collaborator edits back |
-| `/repo-init` | two-branch repo + GitHub + Overleaf setup |
-| `/debug` | persistent debugging session with state file |
-| `/map-codebase` | 4-agent parallel codebase documentation |
-| `/code-review` | local diff review or GitHub PR review |
-| `/insights-triage` | parse /insights report → propose + implement plugins |
-
----
-
-## Hooks reference
-
-| Hook | Event | What it does |
-|---|---|---|
-| `auto-commit-dotfiles.sh` | PostToolUse (Edit/Write) | Auto-commits any write to `~/Git/dotfiles`; coalesces within 30s |
-| `ralph/stop-hook.sh` | Stop | If `.claude/ralph-loop.local.md` exists: blocks session exit and re-injects the prompt for next iteration |
-
-**Ralph loop**: The long-running task mechanism. Activated by `/ralph-loop [description]`. Intercepts session stop and feeds the same prompt back. Runs until Claude outputs `<promise>TEXT</promise>` matching `--completion-promise TEXT`, or `--max-iterations N` is reached. Cancel with `/cancel-ralph`. State file: `.claude/ralph-loop.local.md` in the project root.
-
----
-
-## Adding new plugins
-
-| Want to add... | Where it goes | How |
-|---|---|---|
-| Triggered behavior needing judgment | `skills/` | `writing-skills` skill |
-| Automated tool-event action | `hooks/` | shell script + `settings.json` entry |
-| Multi-step pipeline you type explicitly | `commands/` | `.md` file with frontmatter |
-| Project-specific fact | project `CLAUDE.md` | edit directly |
-| Permanent behavioral preference | `~/.claude/CLAUDE.md` | edit directly |
-| Session fact for future recall | auto-memory | `propose-persistence` skill |
-
-The `propose-persistence` skill fires automatically on strong signals and surfaces one concrete proposal at a time. `/insights-triage` does the same from a `/insights` report.
+- **Pushes** (`hooks/bash-guard.py`): repos listed `free` in `push-policy` push freely; any other repo needs your explicit yes, recorded for that exact commit; `--no-verify` is refused.
+- **Mathematica** (`hooks/bash-guard.py`): a Wolfram program started without `wlrun` or `timeout -s KILL` is refused. **Leftovers** (`hooks/stray-processes.py`): before Claude finishes, kernels and LaTeX runs it started, and orphaned ones, are listed for it to kill.
+- **LaTeX** (`hooks/chktex.sh`): after each `.tex` edit, chktex's substantive warnings go back to Claude.
+- **Loops** (`hooks/protect-checks.py`): while `LOOP/protected.txt` exists, the files it lists cannot be edited.
+- **Dotfiles history**: `hooks/auto-commit-dotfiles.sh` commits each edited file locally and never pushes. No attribution trailers anywhere (`attribution` in settings).
+- **Transcripts** are kept 365 days (`cleanupPeriodDays`), so past sessions stay available for audits.
+- **Connectors**: the unused claude.ai Gmail, Calendar and Drive connectors are blocked (`deniedMcpServers`).

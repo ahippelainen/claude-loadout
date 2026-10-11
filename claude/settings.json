@@ -1,29 +1,33 @@
 {
-  "permissions": {
-    "allow": [
-      "Bash(ruff check:*)",
-      "Bash(ruff format:*)",
-      "Bash(python -m pytest:*)",
-      "Bash(python3 -m pytest:*)",
-      "Bash(git show:*)",
-      "Bash(git log:*)",
-      "Bash(git diff:*)",
-      "Bash(git status:*)",
-      "Bash($HOME/Git/dotfiles/claude/hooks/ralph/setup-ralph-loop.sh:*)",
-      "WebSearch"
-    ],
-    "additionalDirectories": [
-      "/tmp"
-    ]
+  "permissions": {},
+  "attribution": {
+    "commit": "",
+    "pr": ""
   },
+  "cleanupPeriodDays": 365,
+  "deniedMcpServers": [
+    {
+      "serverName": "claude.ai Gmail"
+    },
+    {
+      "serverName": "claude.ai Google Calendar"
+    },
+    {
+      "serverName": "claude.ai Google Drive"
+    }
+  ],
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Write|MultiEdit",
+        "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
             "command": "$HOME/Git/dotfiles/claude/hooks/auto-commit-dotfiles.sh"
+          },
+          {
+            "type": "command",
+            "command": "$HOME/Git/dotfiles/claude/hooks/chktex.sh"
           }
         ]
       }
@@ -33,12 +37,40 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/Git/dotfiles/claude/hooks/ralph/stop-hook.sh"
+            "command": "python3 \"$HOME\"/Git/dotfiles/claude/hooks/stray-processes.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME\"/Git/dotfiles/claude/hooks/bash-guard.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOME\"/Git/dotfiles/claude/hooks/protect-checks.py"
           }
         ]
       }
     ]
   },
   "effortLevel": "high",
-  "model": "opus"
+  "switchModelsOnFlag": false,
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "high"
+    }
+  }
 }

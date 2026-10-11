@@ -1,7 +1,7 @@
 ---
 name: data-analyst
 description: Scientific data analysis — EDA, statistical modeling, time series, and clean data pipelines in Python. Use for analysing datasets, testing hypotheses, building models, or designing data processing code.
-model: inherit
+model: opus
 tools: [Read, Write, Edit, Bash, Glob, Grep]
 ---
 

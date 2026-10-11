@@ -1,163 +1,44 @@
 ---
 name: propose-persistence
-description: Use this skill when you notice a signal that something from the current conversation should be persisted — OR when the user explicitly asks "anything worth saving?", "should we add a skill for this?", "propose persistence", "make this a rule". AUTO-FIRE on strong user-given signals only. DO NOT auto-fire on vague frustration, single corrections, or routine task context.
+description: Picks the right place to persist something from the conversation (skill, hook, command, global CLAUDE.md, auto-memory) and drafts it. Fires when the user says "from now on", "always", "never", "make this a rule", "anything worth saving?", after a second correction on the same point, or on a clear repeated manual ritual. Explicit modes - "token audit" (review this session for waste) and "/insights triage" (turn an /insights report into proposals). Do NOT fire on a single correction, vague frustration or routine task context.
 ---
 
 # Propose persistence
 
-You are acting as a triage layer: something just happened in the
-conversation that *might* deserve to outlive this session, and your job
-is to pick the right bucket, draft the content, and surface it as a
-single concise proposal.
+Something in the conversation may deserve to outlive the session. Pick the right bucket, draft the real content, and propose it in one short message.
 
-## Step 1: decide if anything should be persisted at all
+## When
 
-Bias toward silence. A proposal is worth making only if one of these
-is true:
+Only on one of these; otherwise stay silent:
+- the user corrected the same thing twice, or said "from now on / always / never";
+- the user confirmed a non-obvious approach ("yes, keep doing that");
+- the same multi-step manual ritual ran a third time;
+- the user asked for it, or invoked one of the modes below.
 
-- The user has just corrected you twice on the same thing in this session.
-- The user said something structurally like "from now on X", "always X",
-  "never X".
-- The user just validated a non-obvious approach you chose ("yes exactly,
-  keep doing that").
-- You just completed the same multi-step manual ritual for the third
-  time in this session and it wasn't obviously a one-off.
-- The user explicitly asked for persistence.
-- **Token-waste lens** — you notice a concrete, specific pattern that
-  is burning context for no reason. Examples that qualify:
-  - Same file has been read 3+ times this session → propose pinning
-    the relevant fact into CLAUDE.md or a memory entry.
-  - User typed the same multi-step shell ritual 3+ times → propose a
-    slash command.
-  - A large raw tool output (>2k tokens) was dumped into main context
-    when an `Explore` subagent summary would have sufficed → propose
-    "next time, use Explore for this" as a feedback memory.
-  - User manually ran ruff / tests / a formatter that a PostToolUse
-    hook could automate → propose a hook.
-  - A CLAUDE.md section is bloated and rarely fires → propose moving
-    it into a description-triggered skill.
-  Only fire on *concrete* instances you can point to. Do not
-  speculate about hypothetical waste.
+## Buckets
 
-If none of these, do nothing. Do not proactively comb the session for
-opportunities.
-
-## Step 2: pick the right bucket
-
-Match the signal to exactly one of the six persistence mechanisms.
-Picking the right one is the whole job — a good suggestion in the wrong
-bucket is still a bad suggestion.
-
-| Signal shape | Bucket | File location |
+| Signal | Bucket | Location |
 |---|---|---|
-| Behavioral rule triggered by specific phrasing | Skill | `~/Git/dotfiles/claude/skills/<name>/SKILL.md` |
-| Automated action on tool events (every edit, every commit) | Hook | `~/Git/dotfiles/claude/hooks/<name>.sh` + settings.json |
-| Multi-step pipeline the user types by hand | Slash command | `~/Git/dotfiles/claude/commands/<name>.md` |
-| Project-specific fact or convention | Project CLAUDE.md | `<project>/CLAUDE.md` |
-| Global user preference or rule | Global CLAUDE.md | `~/Git/dotfiles/claude/CLAUDE.md` |
-| Ephemeral-ish fact to recall in future conversations | Auto-memory | `~/.claude/projects/.../memory/<file>.md` |
+| Behaviour that fires on specific phrasing or context | Skill | `~/Git/dotfiles/claude/skills/<name>/SKILL.md` |
+| Deterministic action on a tool event | Hook | `~/Git/dotfiles/claude/hooks/` + `settings.json` |
+| Pipeline the user starts by typing `/name` | Command | `~/Git/dotfiles/claude/commands/<name>.md` |
+| Rule for every session | Global CLAUDE.md | `~/Git/dotfiles/claude/CLAUDE.md` |
+| Fact that may change (project state, a decision) | Auto-memory | `~/.claude/projects/<project>/memory/` + `MEMORY.md` |
 
-### Rules of thumb for disambiguation
+Everything except memory lives in the dotfiles, never in a project repo. Prefer a skill over CLAUDE.md when the rule only matters in some contexts; a hook over a skill when no judgement is needed.
 
-- **Skill vs CLAUDE.md:** if the rule should fire in specific contexts
-  triggered by phrasing, use a skill (description-triggered, loads on
-  demand). If the rule should apply to every single turn of every
-  session, use CLAUDE.md. Prefer skill when in doubt.
+## Draft and propose
 
-- **Hook vs skill:** if the action is deterministic and should fire
-  without the model's involvement, use a hook. If the action requires
-  judgment, use a skill.
+Write the actual content, not a sketch: the full SKILL.md or command with frontmatter, the hook script plus its settings.json block, the exact CLAUDE.md lines, or the memory file plus its index line. Then one message: what was noticed (one sentence), where it goes, the draft, "Save, edit or skip?". One proposal per message; do not re-propose something the user skipped.
 
-- **Command vs skill:** if the user explicitly types `/name` to start
-  it, it's a command. If the user just talks and the behavior should
-  activate implicitly, it's a skill.
+## After approval
 
-- **Auto-memory vs CLAUDE.md:** auto-memory is for facts that may
-  change (current project state, who's doing what). CLAUDE.md is for
-  rules that won't change. A deadline is memory. A tone preference is
-  CLAUDE.md.
+Write it. For a new or renamed skill, agent, command or hook, also regenerate the index (`python3 ~/Git/dotfiles/claude/tools/check.py`) and run `~/Git/dotfiles/install.sh`, since links are made per item and a new skill is invisible until then. Confirm in one line with the file path.
 
-## Step 3: draft the content
+## Mode: token audit (explicit request only)
 
-Write the actual proposed content. Not a placeholder, not "something
-like …" — the real file or edit. The user should be able to approve
-it with one word.
+Review this session for waste and propose the three highest-value structural fixes. Look for: files read repeatedly; large raw output in the main context where a subagent summary would have done; a manual ritual typed three or more times; a check run by hand that a hook could run; always-loaded instructions that did not apply; five or more sequential calls where one search agent would have answered; an agent spawned for a single read. For each: what happened (one sentence, pointing at the moment), a rough cost labelled as an estimate, the fix and its bucket. Then ask which to apply and proceed as above.
 
-### Skill draft shape
+## Mode: /insights triage
 
-```markdown
----
-name: <kebab-case>
-description: <specific trigger phrasing, including "fires on…" and "do NOT fire on…">
----
-
-# <Title>
-
-<One-paragraph mission statement.>
-
-## <Section with the actual rules>
-
-1. <rule>
-2. <rule>
-...
-```
-
-### Hook draft shape
-
-A shell script path under `~/Git/dotfiles/claude/hooks/` plus the JSON
-block to add to settings.json. Include the `matcher` and the full
-command.
-
-### Command draft shape
-
-Full markdown file with frontmatter (`description`, `argument-hint`,
-`allowed-tools`) and numbered steps, following the pattern of existing
-commands in `~/Git/dotfiles/claude/commands/`.
-
-### CLAUDE.md addition shape
-
-The exact lines to add, with enough surrounding context that the user
-can see where they'd go.
-
-### Auto-memory draft shape
-
-The frontmatter + body for the memory file, plus the one-line index
-entry for `MEMORY.md`. Follow the structure from the global auto-memory
-guidance (Why / How to apply lines for feedback and project types).
-
-## Step 4: surface the proposal
-
-One message, following this structure:
-
-1. **What I noticed** (one sentence).
-2. **Where it belongs** (bucket + file path).
-3. **Draft** (the full content, in a code block).
-4. **Ask:** "Save this, edit, or skip?"
-
-Do not pad the proposal with justification beyond one sentence. The user
-is smart; if the draft is good, they'll approve. If it isn't, they'll
-edit. Walls of explanation are noise.
-
-## Step 5: write it if approved
-
-If the user says yes / save / do it:
-
-- Write the file via the appropriate tool.
-- If it's a hook, also update settings.json to wire it in, and `chmod
-  +x` the script.
-- If it's auto-memory, update both the memory file AND the MEMORY.md
-  index.
-- If it's a command or skill under dotfiles, the auto-sync hook will
-  handle the commit. Do not run `/sync-dotfiles` manually.
-- Confirm completion in one line. State the final file path.
-
-## What this skill does NOT do
-
-- Does not propose persistence for things the user has not indicated
-  they care about.
-- Does not propose multiple items in one message. One signal, one
-  proposal. If multiple are genuinely worth it, surface them
-  sequentially across turns, not as a list.
-- Does not rewrite existing skills/commands/hooks unless asked.
-- Does not nag. If the user skipped a proposal once, do not re-surface
-  the same proposal later in the session.
+`/insights` writes an HTML report (the user may also paste its text). Read it and extract: features it suggests that are not installed; proposed CLAUDE.md rules; friction a hook could prevent; repeated patterns that deserve a command; working workflows not yet encoded as skills. Present one numbered table of proposals (bucket, what, source section), ask which to implement, then implement the approved ones one at a time as above.

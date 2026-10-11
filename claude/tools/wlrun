@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# wlrun <timeout_s> <file.wl|.wls|.m> [logfile]
+# Runs a Wolfram script in its own systemd scope (3 GB memory cap, no swap) under a hard KILL timeout,
+# retries on a busy licence, then stops the scope so no kernel survives. Output is redirected, never piped:
+# a KILL takes a pipe's buffer with it, while bytes already written to a file survive.
+# Exit code: wolframscript's own, or 137 after a timeout kill.
+set -u
+
+timeout_s="$1"
+file="$2"
+logfile="${3:-${file%.*}.log}"
+unit="wlrun-$$-$RANDOM"
+
+for attempt in $(seq 1 10); do
+  systemd-run --user --scope --quiet --unit="$unit-$attempt" -p MemoryMax=3G -p MemorySwapMax=0 -- \
+    timeout --signal=KILL "$timeout_s" wolframscript -file "$file" < /dev/null > "$logfile" 2>&1
+  code=$?
+  systemctl --user stop "$unit-$attempt.scope" 2>/dev/null
+  if grep -qi "license error" "$logfile" && (( attempt < 10 )); then
+    echo "wlrun: licence busy (attempt $attempt/10), retrying in 20 s" >&2
+    sleep 20
+    continue
+  fi
+  echo "wlrun: exit $code, log in $logfile" >&2
+  exit "$code"
+done

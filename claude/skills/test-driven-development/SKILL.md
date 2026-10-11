@@ -1,61 +1,35 @@
 ---
 name: test-driven-development
-description: Use when implementing a feature or a bugfix, before writing implementation code. Enforces test-first RED→GREEN→REFACTOR. Do NOT fire for throwaway prototypes, generated scaffolding, or pure config files.
+description: Test-first RED→GREEN→REFACTOR with pytest, including numerical and scientific tests. Invoked explicitly ("TDD this", "test-first", /test-driven-development); it does not fire by itself.
+disable-model-invocation: true
 ---
 
-# Test-Driven Development
+# Test-driven development
 
-Write the test first. Watch it fail. Write minimal code to pass. Repeat.
+Write the test first, watch it fail for the intended reason, write the least code that passes, then clean up with the tests green.
 
-**Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
+## Cycle
 
-## The Iron Law
+1. **Red**: one test for one behaviour, named after the behaviour. Run it (`python -m pytest path/to/test.py::test_name -v`) and confirm it fails because the feature is missing, not because of a typo. A test that passes at once is testing existing behaviour.
+2. **Green**: the simplest code that passes; nothing speculative. Rerun the test and the suite.
+3. **Refactor**: remove duplication and improve names; the tests stay green.
 
+## What to test
+
+- The main path with representative input, the edges (empty, zero, boundary values), and what should raise.
+- Behaviour, not implementation: assert outputs and side effects; a refactor that breaks a test without changing behaviour means the test was wrong.
+- Numerical code: `pytest.approx` or `np.testing.assert_allclose`, never `==` on floats; known analytic cases; symmetries and invariants; limits and asymptotics; `@pytest.mark.parametrize` over inputs.
+
+```python
+@pytest.mark.parametrize("n, expected", [(0, 1.0), (1, -1.0), (2, 1.0)])
+def test_cosine_at_multiples_of_pi(n, expected):
+    assert np.cos(n * np.pi) == pytest.approx(expected, abs=1e-12)
 ```
-NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
-```
 
-Write code before the test? Delete it. Start over.
+## Avoid
 
-## Red-Green-Refactor
+Tests that depend on each other or on shared mutable state (use fixtures); mocking so much that no real logic runs; writing tests after the fact to reach a coverage number.
 
-### RED — Write Failing Test
+## When stuck
 
-One minimal test showing what should happen. One behavior per test. Name describes behavior.
-
-- Tests real behavior, not mock internals
-- Fails for the intended reason (missing feature, not syntax error)
-
-**Verify RED — mandatory:**
-```bash
-python -m pytest path/to/test.py::test_name -v
-```
-Test passes immediately? You're testing existing behavior — fix the test.
-
-### GREEN — Minimal Code
-
-Write the simplest code to pass the test. YAGNI — no speculative features.
-
-**Verify GREEN — mandatory:** re-run same test, confirm it passes and nothing else broke.
-
-### REFACTOR — Clean Up
-
-After green only: remove duplication, improve names. Keep tests green throughout.
-
-## When Stuck
-
-| Problem | Solution |
-|---------|----------|
-| Don't know how to test | Write wished-for API first, work backward from assertion |
-| Test too complicated | Design too complicated — simplify the interface |
-| Must mock everything | Code too coupled — use dependency injection |
-| Test setup huge | Extract fixtures; still complex means simplify design |
-
-## Rationalizations to Reject
-
-| Excuse | Reality |
-|--------|---------|
-| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
-| "I'll test after" | Tests passing immediately prove nothing about correctness. |
-| "Already manually tested" | No record, can't re-run. |
-| "One more fix attempt" | Sunk cost. Keeping unverified code is technical debt. |
+Hard to test usually means hard to use: write the call you wish existed and work back from the assertion; if everything must be mocked, the code is too coupled.

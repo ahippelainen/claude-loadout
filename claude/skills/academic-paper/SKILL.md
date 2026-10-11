@@ -1,135 +1,50 @@
 ---
 name: academic-paper
-description: "Academic paper writing pipeline for physics and interdisciplinary science (hep-th, econophysics, sociophysics). Modes: full, plan, outline, revision, revision-coach, abstract, lit-review, citation-check, format-convert. Output: RevTeX4-2 LaTeX + BibTeX. Citation: INSPIRE-HEP preferred, JHEP/PRD/SciPost/PRE journal targets. Triggers: write paper, draft paper, paper outline, write abstract, revise paper, parse reviews, revision roadmap, I got reviewer comments. Do NOT trigger for: deep research only, pure literature survey, reviewing someone else's paper."
+description: "Drafts and revises the author's hep-th/hep-ph and economics papers from his own notes, results and draft. Modes: outline, draft (subsection by subsection, as paste-ready LaTeX in LLM/), abstract, revision (from a review roadmap), response (coaching on real referee reports: parsed comments, roadmap, response-letter skeleton, completeness check). Triggers: outline the paper, turn my notes into a paper, draft section X, write the abstract, revise per the roadmap, I got referee reports, help me answer the referees, response letter. Do NOT trigger for: literature searches (lit-sweep), citation checks (/cite-check), porting to a journal template (journal-port), simulated peer review (academic-paper-reviewer), derivation checks (physics-review), the introduction, conclusions recap or golden-thread appendix (draft-sections), choosing a journal (journal-picker agent)."
 ---
 
-# Academic Paper — Physics & Interdisciplinary Science Writing Pipeline
+# academic-paper
 
-Structured paper writing for theoretical physics and quantitative interdisciplinary science. Default output format is RevTeX4-2 LaTeX with BibTeX. Target journals: JHEP, PTEP, SciPost Physics, Physical Review D, Physical Review E, Physical Review Letters.
+Turns the author's material into paper text he then rewrites, and helps him answer referees. Content comes only from his notes, results, notebooks, draft and bibliography; this skill supplies structure and prose, never physics, economics or numbers.
 
-## Scope
+## Rules
 
-**Primary domains**: hep-th (AdS/CFT, holography, string theory, quantum gravity), econophysics, sociophysics, statistical physics applied to complex systems.
-
-**This skill does NOT**: fabricate citations, invent results, write beyond what the user provides, modify submitted manuscripts when in review mode.
-
----
+1. **Only his material.** Where the outline needs something the material lacks, write `[MATERIAL GAP: what is missing]`. Never add a result, a derivation step, a number or an interpretation. A citation not in the project's `.bib` or a lit-sweep file is `[CITE: what is needed]`; get it through lit-sweep, never from memory.
+2. **His files are his.** New text goes to `LLM/<YYMMDD>_<section>.tex` as paste-ready blocks. Edit the draft or the notes only when he names the scope in this turn.
+3. **His LaTeX.** Copy the class, macros, citation commands, dash and equation-punctuation conventions from the existing draft or notes; do not choose a class. For a new JHEP draft the class is `article` with `\usepackage{jheppub}` (not `\documentclass{jheppub}`); APS journals use `revtex4-2`; porting to Springer or Elsevier is journal-port's job. Page, word and abstract limits and section rules: check the journal's current author guide, never quote them from memory.
+4. **His style.** Follow the author's style notes where CLAUDE.md names them; where there are none, say you are guessing. Avoid throat-clearing openers, sentences announcing what a section will do, lists padded to three, synonym cycling for a technical term, and "we show that" without the result.
+5. **Hand-over.** Every block comes with the list of placeholders left (`[MATERIAL GAP]`, `[CITE]`) and the sources it drew on (file and section or line).
 
 ## Modes
 
-| Mode | Trigger | What it does |
-|------|---------|--------------|
-| `full` | "write a paper on X" | Full pipeline: config → literature → structure → draft → citations → review → output |
-| `plan` | "guide my paper", "help me plan" | Socratic chapter-by-chapter planning before writing |
-| `outline` | "paper outline" | Structure + section plan only |
-| `revision` | "revise paper", "incorporate these comments" | Targeted revision from reviewer feedback |
-| `revision-coach` | "parse reviews", "I got reviewer comments", "revision roadmap" | Parse unstructured referee reports into prioritized revision roadmap |
-| `abstract` | "write abstract" | Abstract only: structured (context/gap/approach/result/significance) |
-| `lit-review` | "literature review section" | Related work section with INSPIRE-HEP search strategy |
-| `citation-check` | "check citations", "verify references" | Audit BibTeX entries, flag missing DOIs/arXiv IDs, detect orphans |
-| `format-convert` | "convert to LaTeX", "clean up bibliography" | Format conversion, BibTeX cleanup, journal style adaptation |
+### outline
+Input: notes, results, any draft. Output: a section plan in which each section lists the content it carries (with where it sits in the notes), its equations and figures, and the claim it supports; then the paper's main claims as the notes state them, each with where it is established (equation, figure, notebook). Follow the structure of his existing papers or notes. Defaults: hep-th: introduction, setup or model, main computation, results, discussion and conclusions, appendices; economics: introduction, related literature if the journal expects a separate section, model or framework, results, discussion and conclusions. Ask only about choices only he can make (the headline result, what goes to appendices). **Checkpoint:** he confirms the outline before any drafting.
 
-Not sure? Use `plan` — it guides step by step before any writing happens.
+### draft
+One subsection at a time: draft it, he rewrites it, then the next. Each block: LaTeX in his dialect, placeholders, sources. The introduction, the conclusions recap and the golden-thread appendix go to draft-sections. A related-work paragraph uses only the `.bib` and the lit-sweep notes, and keeps their tags: another paper's ASSERTED claim is not described as its result, and an `[abstract only]` paper is cited for what its abstract claims, if at all.
 
----
+### abstract
+Problem; what was done; the main result stated specifically (the number, scaling, sign or condition as the body states it); its implication. One or two variants. Nothing that is not in the body. Length from the journal's guide.
 
-## Configuration Interview (all modes except revision-coach and citation-check)
+### revision
+Input: `decision.md` from academic-paper-reviewer, or his own list. For each item: the proposed change as a paste-ready block with its location. Items needing a new calculation or analysis are listed for him, not attempted. Afterwards suggest /cite-check if references changed, and academic-paper-reviewer's re-review mode.
 
-Before starting, confirm:
+### response (real referee reports)
+1. **Parse.** Every comment verbatim, multi-point comments split, numbered `E.1` (editor), `R1.1`, `R1.2`, `R2.1`, ...; nothing dropped (state the count). Ask where a boundary or a meaning is unclear.
+2. **Classify and locate.** Must address (the editor requires it, or it challenges correctness, novelty or a stated claim), should address, editorial, positive; map each to a section or equation. Flag referees who contradict each other, and comments that look technically wrong (for a disputed derivation, physics-review in verify mode; he decides).
+3. **Coach**, for each must-address comment: the referee's actual concern; agree, partly agree or disagree, which is his call; what the answer would say and what change it implies; the risk of declining. Do not default to accepting everything: referees can be wrong. Arguments for disagreeing come from his material, not from invention.
+4. **Output** in `LLM/<YYMMDD>_response/`: `roadmap.md` (id, summary, class, location, planned action, status) and a response-letter skeleton that quotes each comment, with `Response:` and `Changes:` placeholders for him. Status: RESOLVED (change and location), CLARIFIED (explained, and the text changed so the misreading cannot recur), DECLINED (with the argument and its evidence). Reuse the format of an earlier response letter in the project if there is one.
+5. **Completeness check** before resubmission: every comment has a response; every "changed in Sec. X" is present in the revised source (diff old against new); new references pass /cite-check.
 
-1. **Paper type**: Research article / Letter / Review / Proceedings contribution
-2. **Domain**: hep-th / econophysics / sociophysics / other (specify)
-3. **Target journal**: JHEP / SciPost Physics / PRD / PRL / PRE / PTEP / other
-4. **Stage**: Starting from scratch / have notes / have draft / have submitted version
-5. **Existing materials**: list what exists (notes, calculations, Mathematica outputs, prior drafts)
-6. **Word/page target**: journal-specific (e.g., JHEP research article: no hard limit; PRL: 4500 words)
-
-Output a **Paper Configuration Record** and wait for user confirmation before proceeding.
-
----
-
-## Full Pipeline
-
-```
-Phase 0: CONFIG        → Paper Configuration Record (user confirms)
-Phase 1: LITERATURE    → INSPIRE-HEP search strategy + annotated key references
-Phase 2: STRUCTURE     → Section plan + logical flow + equation map
-Phase 3: ARGUMENT      → Claim-evidence chains, identify novel contribution
-Phase 4: DRAFTING      → Section-by-section draft in RevTeX4-2
-Phase 5: CITATIONS     → BibTeX audit, arXiv IDs, INSPIRE keys
-Phase 6: REVIEW        → Self-review against journal criteria
-Phase 7: OUTPUT        → Final .tex + .bib package
-```
-
-User confirms after Phase 0 (config) and Phase 2 (structure) before drafting begins.
-
----
-
-## Physics Writing Standards
-
-### Structure
-Standard hep-th structure: Introduction (motivation + results summary) → Setup/Model → Main calculation/analysis → Results → Discussion → Conclusion → Appendices (technical details). Adapt for econophysics/sociophysics as appropriate (may use IMRaD for empirical papers targeting PRE).
-
-### Citations
-- Use INSPIRE-HEP keys: `Author:YEARabc` format (e.g., `Maldacena:1997re`)
-- arXiv IDs mandatory for all preprints: `\eprint{hep-th/9711200}`
-- DOI mandatory when published
-- No fabricated references. If unsure a paper exists, say so — do not invent one.
-- Flag papers that appear only in memory without a verifiable arXiv/DOI
-
-### LaTeX conventions
-- RevTeX4-2: `\documentclass[aps,prd,twocolumn]{revtex4-2}` for PRD; `\documentclass{jheppub}` for JHEP
-- Equations: `align` environment, numbered unless inline
-- Figures: EPS or PDF, `\includegraphics`
-- No `\usepackage{hyperref}` conflicts with RevTeX — use `hyperref` option in documentclass
-- BibTeX database: one `.bib` file, INSPIRE export format
-
-### Abstract structure (hep-th)
-1. What is the problem / question
-2. What did we do (method/model)
-3. Main result (be specific — state the result, not "we find interesting behavior")
-4. Significance / implication
-
-### Common anti-patterns to avoid
-- "We show that..." without stating what you show
-- Placeholder equations that don't match the text
-- Citation to "it is well known" without a reference
-- IRON RULE: never write `[citation needed]` in a draft — flag it explicitly as `[CITE: describe what's needed]` so it's findable
-
----
-
-## Revision-Coach Mode
-
-Input: raw referee reports (paste text or provide file).
-
-Output:
-1. Parsed referee comments classified as: **Critical** (must address) / **Major** (should address) / **Minor** (optional)
-2. Each comment mapped to paper section
-3. Prioritized revision roadmap with suggested response strategy
-4. Response letter skeleton
-
-Disambiguation rule: when a referee comment is ambiguous, flag it and ask rather than guess.
-
----
-
-## Failure Paths
+## Failure paths
 
 | Situation | Handling |
-|-----------|----------|
-| Insufficient prior work to write from | Recommend running `deep-research-academic` first |
-| User provides wrong journal target | Suggest appropriate venue for paper type/domain |
-| Citation cannot be verified | Flag as `[UNVERIFIED: author, year, title]` — never fabricate |
-| Calculation/derivation needed | Stop — derivations require user input, not generation |
-| Reviewer comment contradicts physics | Flag for user decision; do not silently accept wrong physics |
+|---|---|
+| Too little material to write from | Say what is missing; literature gaps go to lit-sweep; nothing filled from memory |
+| A derivation is needed | Stop: derivations are his. Checking one is physics-review |
+| A referee comment contradicts the physics or the economics | Flag it with the reason; he decides |
+| No target journal yet | journal-picker agent |
 
----
+## Place in the pipeline
 
-## Integration
-
-```
-deep-research-academic  →  academic-paper (full/plan)  →  academic-paper-reviewer
-                                                        ↓
-                                               revision-coach mode
-                                                        ↓
-                                               academic-paper (revision mode)
-```
+lit-sweep → academic-paper (outline, draft, abstract) → /cite-check → academic-paper-reviewer → academic-paper (revision) → re-review → journal-port → arxiv-package. Real referee reports enter at the response mode.

@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+results/raw/
+run/
+*.log
+lit/pdf/
+# runtime-only, host-local
+jobs/running/*.yaml
+ops/agent-loops.enabled
+ops/reaper.live
+# never commit text dumps of papers (copyright)
+**/*-scratch/*.txt.dump
+**/*pdftotext*
